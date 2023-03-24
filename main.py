@@ -30,7 +30,7 @@ class Window(QWidget):
         # picture show
         self.imgArea = QLabel()
         self.imgArea.setScaledContents(True)
-        img = QPixmap('./main.jpg')
+        img = QPixmap('E:\pythonProject\ocr\data_label\imageLabel\main.jpg')
         self.imgArea.setPixmap(img)
 
         # text input
@@ -75,7 +75,7 @@ class Window(QWidget):
 
         # window size and location
         # window icon
-        self.setWindowIcon(QIcon('./icon.png'))
+        self.setWindowIcon(QIcon('E:\pythonProject\ocr\data_label\imageLabel\icon.ico'))
         self.setLayout(vbox)
         # self.setGeometry(300, 300, 800, 100)
         self.setFixedSize(800, 300)
@@ -96,7 +96,11 @@ class Window(QWidget):
     
     def openButtonClicked(self):
         dirPath = QFileDialog.getExistingDirectory(self, "ChooseDirctory", "./", QFileDialog.ShowDirsOnly)
-        pathList = os.listdir(dirPath)
+        pathList = []
+        if os.path.exists(dirPath):
+            pathList = os.listdir(dirPath)
+        else:
+            pass
         self.img_paths = []
         self.img_id = 0
         self.onShowAngle = 0
@@ -143,13 +147,16 @@ class Window(QWidget):
             pass
 
     def spinButtonClicked(self):
-        self.onShowAngle = (self.onShowAngle + 90) % 360
-        self.releaseInfo(None, str(self.onShowAngle), None)
-        mat = QTransform()
-        mat.rotate(self.onShowAngle)
-        img = QPixmap(self.img_paths[self.img_id])
-        img = img.transformed(mat)
-        self.imgArea.setPixmap(img)
+        if self.img_id < len(self.img_paths):
+            self.onShowAngle = (self.onShowAngle + 90) % 360
+            self.releaseInfo(None, str(self.onShowAngle), None)
+            mat = QTransform()
+            mat.rotate(self.onShowAngle)
+            img = QPixmap(self.img_paths[self.img_id])
+            img = img.transformed(mat)
+            self.imgArea.setPixmap(img)
+        else:
+            pass
     
     def releaseInfo(self, path, angle, label):
         if path != None:
