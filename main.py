@@ -41,9 +41,11 @@ class Window(QWidget):
         self.info_path.setMinimumWidth(300)
         self.info_angle = QLabel()
         self.info_angle.setMinimumWidth(100)
+        self.info_label = QLabel()
         infoBar = QStatusBar()
         infoBar.addWidget(self.info_path)
         infoBar.addWidget(self.info_angle)
+        infoBar.addWidget(self.info_label)
         infoBar.setFixedHeight(20)
 
         # arrangement
@@ -104,14 +106,24 @@ class Window(QWidget):
             if ext == ".jpg" or ext == ".png":
                 self.img_paths.append(dirPath + "/" + path)
         if self.img_id < len(self.img_paths):
-            self.releaseInfo(self.img_paths[self.img_id], str(self.onShowAngle))
+            label_path = self.img_paths[self.img_id][:-4] + ".txt"
+            label_info = None
+            if os.path.exists(label_path):
+                with open(label_path, 'r') as f:
+                    label_info = f.readline()
+            self.releaseInfo(self.img_paths[self.img_id], str(self.onShowAngle), label_info)
             self.imgArea.setPixmap(QPixmap(self.img_paths[self.img_id]))
     
     def nextButtonClicked(self):
         if self.img_id + 1 < len(self.img_paths):
             self.img_id += 1
             self.onShowAngle = 0
-            self.releaseInfo(self.img_paths[self.img_id], str(self.onShowAngle))
+            label_path = self.img_paths[self.img_id][:-4] + ".txt"
+            label_info = None
+            if os.path.exists(label_path):
+                with open(label_path, 'r') as f:
+                    label_info = f.readline()
+            self.releaseInfo(self.img_paths[self.img_id], str(self.onShowAngle), label_info)
             self.imgArea.setPixmap(QPixmap(self.img_paths[self.img_id]))
         else:
             pass
@@ -120,25 +132,32 @@ class Window(QWidget):
         if self.img_id > 0:
             self.img_id -= 1
             self.onShowAngle = 0
-            self.releaseInfo(self.img_paths[self.img_id], str(self.onShowAngle))
+            label_path = self.img_paths[self.img_id][:-4] + ".txt"
+            label_info = None
+            if os.path.exists(label_path):
+                with open(label_path, 'r') as f:
+                    label_info = f.readline()
+            self.releaseInfo(self.img_paths[self.img_id], str(self.onShowAngle), label_info)
             self.imgArea.setPixmap(QPixmap(self.img_paths[self.img_id]))
         else:
             pass
 
     def spinButtonClicked(self):
         self.onShowAngle = (self.onShowAngle + 90) % 360
-        self.releaseInfo(None, str(self.onShowAngle))
+        self.releaseInfo(None, str(self.onShowAngle), None)
         mat = QTransform()
         mat.rotate(self.onShowAngle)
         img = QPixmap(self.img_paths[self.img_id])
         img = img.transformed(mat)
         self.imgArea.setPixmap(img)
     
-    def releaseInfo(self, path, angle):
+    def releaseInfo(self, path, angle, label):
         if path != None:
             self.info_path.setText(path)
         if angle != None:
-            self.info_angle.setText(angle)
+            self.info_angle.setText("rotate:" + angle)
+        if label != None:
+            self.info_label.setText("label:" + label)
 
 
 if __name__ == '__main__':
